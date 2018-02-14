@@ -26,7 +26,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 public class MutualFriends {
 	public static class Map extends Mapper<LongWritable, Text, Text, Text>{
-		
+
 		private Text pair = new Text(); // type of output key
 		private Text List = new Text();
 
@@ -35,20 +35,20 @@ public class MutualFriends {
 			String User = line[0];
 			if (line.length ==2) {
 				ArrayList<String> FriendsList = new ArrayList<String>(Arrays.asList(line[1].split("\\,")));
-				for(String Friend:FriendsList){				
+				for(String Friend:FriendsList){
 					String FriendPair = (Integer.parseInt(User) < Integer.parseInt(Friend))?User+"\t"+Friend:Friend+"\t"+User;
 					ArrayList<String> temp = new ArrayList<String>(FriendsList);
-					temp.remove(Friend); 
+					temp.remove(Friend);
 					String listString = String.join(",", temp);
 					pair.set(FriendPair);
 					List.set(listString);
 					context.write(pair,List);
 				}
 			}
-			
+
 		}
 	}
-		
+
 	public static class Reduce extends Reducer<Text,Text,Text,Text> {
 		private Text result = new Text();
 		public String Mutual(String s1,String s2,int i) {
@@ -66,24 +66,23 @@ public class MutualFriends {
 					System.out.print(s+"& ");
 				}
 			}
-			return result;	
+			return result;
 		}
-		
-		
+
+
 		public void reduce(Text key, Iterable<Text> values,Context context) throws IOException, InterruptedException {
 			String[] Friend_key_values = new String[2];
 			int i=0;
 			for(Text value:values){
 				Friend_key_values[i++] = value.toString();
 			}
-			
-			System.out.println(key+" -- "+Friend_key_values[0] + " ~~~ "+Friend_key_values[1]);
+
 			result.set(Mutual(Friend_key_values[0],Friend_key_values[1],i));
 			i++;
 			context.write(key,result);// create a pair <keyword, number of occurences>
 		}
 	}
-		
+
 	public static void main(String[] args) throws Exception {
 		  	Configuration conf = new Configuration();
 		  	String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
@@ -109,6 +108,6 @@ public class MutualFriends {
 		  	FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 		  	//Wait till job completion
 		  	System.exit(job.waitForCompletion(true) ? 0 : 1);
-	}	
+	}
 
 }
