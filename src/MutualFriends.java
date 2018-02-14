@@ -60,10 +60,8 @@ public class MutualFriends {
 				map.add(s);
 			}
 			for(String s:s2_split) {
-				System.out.print(s+"% ");
 				if (map.contains(s)){
 					result +=s+",";
-					System.out.print(s+"& ");
 				}
 			}
 			return result;
